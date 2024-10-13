@@ -1,0 +1,19 @@
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
+[package]
+name = "rust-os"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bootloader = "0.9"
+
+[build]
+target = "x86_64.json"
+
+[target.'cfg(target_os = "none")']
+runner = "bootimage runner"
