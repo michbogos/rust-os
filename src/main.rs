@@ -17,8 +17,7 @@ static HELLO: &[u8] = b"";
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    let mut buffer:VGABuffer = VGABuffer{size:25*80,idx:0,adress:0xb8000 as *mut u16};
-    vga::print(&mut buffer, "Hello", vga::VGACol::L_CYAN, vga::VGACol::GREEN);
+    vga::VGA.lock().print( "Hello\nHello\nHello", vga::VGACol::LCYAN, vga::VGACol::GREEN);
     // *vga_buffer.offset(i as isize * 2) = byte;
     // *vga_buffer.offset(i as isize * 2 + 1) = i as u8;
 
