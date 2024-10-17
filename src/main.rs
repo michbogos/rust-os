@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use core::panic::PanicInfo;
+use core::{borrow::BorrowMut, panic::PanicInfo, fmt::Write};
 
 use vga::VGABuffer;
 
@@ -17,7 +17,7 @@ static HELLO: &[u8] = b"";
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    vga::VGA.lock().print( "Hello\nHello\nHello", vga::VGACol::LCYAN, vga::VGACol::GREEN);
+    write!(*vga::VGA.lock(), "Hello {}\n", 1.2);
     // *vga_buffer.offset(i as isize * 2) = byte;
     // *vga_buffer.offset(i as isize * 2 + 1) = i as u8;
 

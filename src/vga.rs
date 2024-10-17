@@ -1,5 +1,6 @@
 use lazy_static::lazy_static;
 use spin::Mutex;
+use core::fmt;
 
 pub struct VGAAdress{
     adress:*mut u16,
@@ -27,6 +28,14 @@ impl VGABuffer{
                 self.idx=(self.idx+1)%self.size;
             }
         }
+    }
+}
+
+
+impl fmt::Write for VGABuffer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.print(s, VGACol::LWHITE, VGACol::BLACK);
+        Ok(())
     }
 }
 
