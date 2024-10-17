@@ -1,6 +1,7 @@
 use lazy_static::lazy_static;
 use spin::Mutex;
 use core::fmt;
+use core;
 
 pub struct VGAAdress{
     adress:*mut u16,
@@ -15,6 +16,7 @@ pub struct VGABuffer{
 
 unsafe impl Send for VGAAdress {}
 
+// Possibly use volatile
 impl VGABuffer{
     pub fn print(&mut self, msg:&str, fg:VGACol, bg:VGACol){
         for c in msg.bytes(){
@@ -37,6 +39,23 @@ impl fmt::Write for VGABuffer {
         self.print(s, VGACol::LWHITE, VGACol::BLACK);
         Ok(())
     }
+}
+
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ($crate::vga::_print(format_args!($($arg)*)));
+}
+
+#[macro_export]
+macro_rules! println {
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
+}
+
+#[doc(hidden)]
+pub fn _print(args: fmt::Arguments) {
+    use core::fmt::Write;
+    VGA.lock().write_fmt(args).unwrap();
 }
 
 lazy_static!{

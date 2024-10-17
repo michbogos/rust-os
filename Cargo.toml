@@ -20,9 +20,6 @@ features = ["spin_no_std"]
 [build]
 target = "x86_64.json"
 
-[target.'cfg(target_os = "none")']
-runner = "bootimage runner"
-
 [toolchain]
 channel = "nightly"
 
