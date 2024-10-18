@@ -6,6 +6,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
+use raw_cpuid::CpuId;
 
 mod vga;
 
@@ -14,6 +15,16 @@ fn trivial_assertion() {
     print!("trivial assertion... ");
     assert_eq!(1, 1);
     println!("[ok]");
+}
+
+#[test_case]
+fn get_cpuid() {
+    print!("Getting cpuid... ");
+    let cpuid = CpuId::new();
+    if let Some(vf) = cpuid.get_vendor_info() {
+        println!("{}", vf.as_str());
+        assert!(vf.as_str() == "GenuineIntel" || vf.as_str() == "AuthenticAMD");
+    }
 }
 
 #[cfg(test)]
