@@ -13,6 +13,8 @@ edition = "2021"
 bootloader = "0.9"
 spin = "0.5.2"
 raw-cpuid = "11.2.0"
+x86_64 = "0.15.1"
+uart_16550 = "0.3.1"
 
 [dependencies.lazy_static]
 version = "1.0"
@@ -24,3 +26,7 @@ target = "x86_64.json"
 [toolchain]
 channel = "nightly"
 
+[package.metadata.bootimage]
+test-args = ["-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio", "-display", "none"]
+test-success-exit-code = 33
+test-timeout = 30

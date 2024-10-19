@@ -88,3 +88,15 @@ pub fn vga_char(symbol:u8, fg:VGACol, bg:VGACol)->u16{
     res = res|(((bg as u8) as u16)<<12) as u16;
     return res;
 }
+
+#[test_case]
+fn test_println_simple() {
+    println!("test_println_simple output");
+}
+
+#[test_case]
+fn test_println_many() {
+    for _ in 0..200 {
+        println!("test_println_many output");
+    }
+}
