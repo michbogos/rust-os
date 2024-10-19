@@ -11,6 +11,11 @@ use rust_os::println;
 pub extern "C" fn _start() -> ! {
     println!("Hello World{}", "!");
 
+    rust_os::init();
+    x86_64::instructions::interrupts::int3();
+
+    println!("Did not crash");
+
     #[cfg(test)]
     test_main();
 
