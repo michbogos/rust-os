@@ -14,8 +14,6 @@ pub extern "C" fn _start() -> ! {
     rust_os::init();
     x86_64::instructions::interrupts::int3();
 
-    println!("Did not crash");
-
     #[cfg(test)]
     test_main();
 
