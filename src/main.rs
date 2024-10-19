@@ -16,7 +16,7 @@ pub extern "C" fn _start() -> ! {
     test_main();
     println!("Initialization complete.");
 
-    loop {}
+    loop {x86_64::instructions::hlt()};
 }
 
 /// This function is called on panic.
@@ -24,7 +24,7 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    loop {x86_64::instructions::hlt()};
 }
 
 #[cfg(test)]

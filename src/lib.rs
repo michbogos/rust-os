@@ -40,7 +40,7 @@ pub fn test_panic_handler(_info: &PanicInfo) -> ! {
     serial_println!("[failed]\n");
     serial_println!("Error: {}\n", _info);
     exit_qemu(QemuExitCode::Failed);
-    loop {}
+    loop {x86_64::instructions::hlt()};
 }
 
 pub trait Testable {
@@ -63,7 +63,7 @@ where
 pub extern "C" fn _start() -> ! {
     init();
     test_main();
-    loop {}
+    loop {x86_64::instructions::hlt()};
 }
 
 #[cfg(test)]
