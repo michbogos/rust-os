@@ -10,7 +10,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bootloader = "0.9"
+bootloader = {version="0.9", features = ["map_physical_memory"]}
 spin = "0.5.2"
 raw-cpuid = "11.2.0"
 x86_64 = "0.15.1"
