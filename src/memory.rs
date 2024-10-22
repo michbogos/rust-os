@@ -1,7 +1,12 @@
+use x86_64::structures::paging::mapper::MapToError;
 use x86_64::structures::paging::{mapper, page, FrameAllocator, Mapper, Page, PageTable, PhysFrame, Size4KiB};
 use x86_64::{PhysAddr, VirtAddr};
 use x86_64::structures::paging::OffsetPageTable;
 use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
+use linked_list_allocator::LockedHeap;
+
+#[global_allocator]
+static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static>{
     let level4_table = active_level4_table(physical_memory_offset);
@@ -66,4 +71,30 @@ unsafe impl FrameAllocator<Size4KiB> for BootInfoFrameAllocator {
         self.next += 1;
         return frame;
     }
+}
+
+pub fn init_heap(mapper:&mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>, heap_start:u64, heap_size:u64)->Result<(), MapToError<Size4KiB>>{
+    let page_range = {
+        let heap_start = VirtAddr::new(heap_start as u64);
+        let heap_end = heap_start + heap_size - 1u64;
+        let heap_start_page = Page::containing_address(heap_start);
+        let heap_end_page = Page::containing_address(heap_end);
+        Page::range_inclusive(heap_start_page, heap_end_page)
+    };
+
+    for page in page_range {
+        let frame = frame_allocator
+            .allocate_frame()
+            .ok_or(MapToError::FrameAllocationFailed)?;
+        let flags = x86_64::structures::paging::PageTableFlags::PRESENT | x86_64::structures::paging::PageTableFlags::WRITABLE;
+        unsafe {
+            mapper.map_to(page, frame, flags, frame_allocator)?.flush()
+        };
+    }
+
+    unsafe{
+        ALLOCATOR.lock().init(heap_start as usize, heap_size as usize);
+    }
+
+    Ok(())
 }
