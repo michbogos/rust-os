@@ -1,8 +1,10 @@
 use lazy_static::lazy_static;
 use spin::Mutex;
 use x86_64::instructions::port::PortGeneric;
+use x86_64::structures::port::{PortRead, PortWrite};
 use core::fmt;
 use core;
+use core::ops::Div;
 
 pub struct VGAAdress{
     adress:*mut u16,
@@ -30,7 +32,6 @@ impl VGABuffer{
                 self.idx=(self.idx+1)%self.size;
             }
         }
-        update_cursor(1, 1);
     }
 }
 
@@ -38,6 +39,7 @@ impl VGABuffer{
 impl fmt::Write for VGABuffer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.print(s, VGACol::LWHITE, VGACol::BLACK);
+        update_cursor((self.idx%80) as i32, -1+(self.idx/80) as i32);
         Ok(())
     }
 }
