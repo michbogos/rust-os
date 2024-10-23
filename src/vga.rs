@@ -1,12 +1,12 @@
 use lazy_static::lazy_static;
 use spin::Mutex;
+use x86_64::instructions::port::PortGeneric;
 use core::fmt;
 use core;
 
 pub struct VGAAdress{
     adress:*mut u16,
 }
-
 
 pub struct VGABuffer{
     pub size:usize,
@@ -30,6 +30,7 @@ impl VGABuffer{
                 self.idx=(self.idx+1)%self.size;
             }
         }
+        update_cursor(1, 1);
     }
 }
 
@@ -88,6 +89,37 @@ pub fn vga_char(symbol:u8, fg:VGACol, bg:VGACol)->u16{
     res = res|(((fg as u8) as u16)<<8) as u16;
     res = res|(((bg as u8) as u16)<<12) as u16;
     return res;
+}
+
+
+pub fn enable_cursor(start: u8, end:u8){
+    use x86_64::instructions::port::Port;
+    let mut x3D4: Port<u8> = Port::new(0x3D4);
+    let mut x3D5: Port<u8> = Port::new(0x3D5);
+    unsafe{
+        x3D4.write(0x0A);
+        let mut x3D5_val = x3D5.read();
+        x3D5.write((x3D5_val & 0xC0) | start);
+
+        x3D4.write(0x0B);
+        x3D5_val = x3D5.read();
+        x3D5.write((x3D5_val & 0xE0) | end);
+
+    }
+}
+
+pub fn update_cursor(x:i32, y:i32){
+    use x86_64::instructions::port::Port;
+    let mut x3D4: Port<u8> = Port::new(0x3D4);
+    let mut x3D5: Port<u8> = Port::new(0x3D5);
+	let pos:u16 = (y * 80 + x) as u16;
+
+    unsafe{
+	    x3D4.write(0x0F);
+	    x3D5.write((pos & 0xFF) as u8);
+	    x3D4.write(0x0E);
+	    x3D5.write(((pos >> 8) & 0xFF) as u8);
+    }
 }
 
 #[test_case]

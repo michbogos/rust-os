@@ -5,7 +5,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-use rust_os::{memory::init_heap, println};
+use rust_os::{memory::init_heap, println, vga};
 use bootloader::{entry_point, BootInfo};
 use rust_os::memory;
 use x86_64::{structures::paging::Page, VirtAddr}; // new import
@@ -19,6 +19,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     println!("Hello World{}", "!");
 
     rust_os::init();
+
+    vga::enable_cursor(0, 15);
 
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
     let mut mapper = unsafe { memory::init(phys_mem_offset) };
